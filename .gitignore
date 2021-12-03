@@ -2,3 +2,4 @@ venv
 *.h5
 hdf5Pandas.py
 requirements.txt
+percipitation_jan_2020.csv
