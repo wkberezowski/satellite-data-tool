@@ -46,3 +46,26 @@ with h5py.File('hdf5GroupsCompressed.h5', 'w') as hdf:
  
  G22 = hdf.create_group('Group2/SubGroup2')
  G22.create_dataset('dataset2', data=matrix2, compression='gzip', compression_opts=9)
+
+# ATRIBUTES
+with h5py.File('test.h5', 'w') as hdf:
+ dataset1 = hdf.create_dataset('dataset1', data=matrix1)
+ dataset2 = hdf.create_dataset('dataset2', data=matrix2)
+ 
+ dataset1.attrs['CLASS'] = 'DATA MATRIX'
+ dataset1.attrs['VERSION'] = '1.1'
+ 
+with h5py.File('test.h5', 'r') as hdf:
+ ls = list(hdf.keys())
+ print('List of dataset keys in this file: {}'.format(ls))
+ data = hdf.get('dataset1')
+ dataset1 = np.array(data)
+ print('Print shape of the dataset1: {}'.format(dataset1.shape))
+ k = list(data.attrs.keys())
+ v = list(data.attrs.values())
+ 
+ print(k[0])
+ print(v[0])
+ print(data.attrs[k[0]])
+ 
+
