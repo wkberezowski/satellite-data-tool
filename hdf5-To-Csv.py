@@ -2,10 +2,10 @@ import h5py
 import numpy as np
 import pandas as pd
 
-dataset = h5py.File('data\gpm_jan_2020.HDF5', 'r')
+dataframe = h5py.File('data\gpm_jan_2020.HDF5', 'r')
 
-grid = dataset['Grid']
-print(grid.keys())
+grid = dataframe['Grid']
+# print(grid.keys())
 
 print("Longitude data: {}".format(grid['lon']))
 print("Longitude data attributes: {}".format(list(grid['lon'].attrs)))
@@ -16,16 +16,16 @@ lonValues = np.repeat(list(grid['lon']), 1800)
 latValues = list(grid['lat']) * 3600
 percipitationValues = np.array(list(grid['precipitation'])).flatten()
 
-dataset = pd.DataFrame({'lon': lonValues,
+dataframe = pd.DataFrame({'lon': lonValues,
                         'lat': latValues,
                         'Precipitation': percipitationValues
                         })
 
-dataset.columns = [grid['lon'].attrs['standard_name'].decode() + ' (' + grid['lon'].attrs['units'].decode() + ')',
+dataframe.columns = [grid['lon'].attrs['standard_name'].decode() + ' (' + grid['lon'].attrs['units'].decode() + ')',
                    grid['lat'].attrs['standard_name'].decode() + ' (' + grid['lat'].attrs['units'].decode() + ')',
                   'Precipitation (' + grid['precipitation'].attrs['units'].decode() + ')'
                    ]
 
-dataset['Precipitation (mm/hr)'] = dataset['Precipitation (mm/hr)'].mask(dataset['Precipitation (mm/hr)'] == -9999.900391, 0)
+dataframe['Precipitation (mm/hr)'] = dataframe['Precipitation (mm/hr)'].mask(dataframe['Precipitation (mm/hr)'] == -9999.900391, 0)
 
-dataset.to_csv('percipitation_jan_2020.csv', index=False)
+dataframe.to_csv('percipitation-from-hdf.csv', index=False)
