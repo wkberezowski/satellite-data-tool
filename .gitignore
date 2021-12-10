@@ -1,5 +1,5 @@
 venv
 *.h5
-hdf5Pandas.py
 requirements.txt
 *.csv
+__pycache__
