@@ -1,6 +1,7 @@
 import h5py
 import numpy as np
 import pandas as pd
+import netCDF4
 
 def hdf5_to_csv():
  dataframe = h5py.File('data\gpm_jan_2020.HDF5', 'r')
@@ -24,3 +25,26 @@ def hdf5_to_csv():
  dataframe['Precipitation (mm/hr)'] = dataframe['Precipitation (mm/hr)'].mask(dataframe['Precipitation (mm/hr)'] == -9999.900391, 0)
 
  dataframe.to_csv('percipitation-from-hdf.csv', index=False)
+ 
+
+def netCDF_to_csv():
+ # READ DATASET
+ dataset = netCDF4.Dataset('./data/daymet_v3_prcp_monttl_2017_hi.nc4', 'r', format='NETCDF4')
+
+ # DONT KNOW IF ITS BETTER TO USE LON/LAT OR Y/X
+ lon = dataset['lon'][:, 0]
+ lat = dataset['lat'][0]
+ prcp = dataset['prcp'][0]
+
+
+ lonValues = np.repeat(list(lon), lat.size)
+ latValues = list(lat) * lon.size
+ prcpValues = np.array(list(prcp)).flatten()
+
+ dataframe = pd.DataFrame({'lon': lonValues,
+                           'lat': latValues,
+                           'prcp': prcpValues})
+
+ dataframe.columns = ['{} in {}'.format(dataset['lon'].standard_name, dataset['lon'].units), '{} in {}'.format(dataset['lat'].standard_name, dataset['lat'].units), '{} in {}'.format(dataset['prcp'].long_name, dataset['prcp'].units)]
+
+ dataframe.to_csv('percipitation-from-netCDF.csv', index=False) 
