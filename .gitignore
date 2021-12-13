@@ -3,3 +3,4 @@ venv
 requirements.txt
 *.csv
 __pycache__
+.vscode
