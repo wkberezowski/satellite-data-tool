@@ -2,7 +2,7 @@ import h5py
 import numpy as np
 import pandas as pd
 import netCDF4
-
+import matplotlib.pyplot as plt
 
 def hdf5_to_csv():
     dataframe = h5py.File('data\gpm_jan_2020.HDF5', 'r')
@@ -12,6 +12,7 @@ def hdf5_to_csv():
     lon_values = np.repeat(list(grid['lon']), 1800)
     lat_values = list(grid['lat']) * 3600
     percip_values = np.array(list(grid['precipitation'])).flatten()
+    
 
     dataframe = pd.DataFrame({'lon': lon_values,
                               'lat': lat_values,
@@ -29,7 +30,7 @@ def hdf5_to_csv():
     dataframe['Precipitation (mm/hr)'] = dataframe['Precipitation (mm/hr)'].mask(
         dataframe['Precipitation (mm/hr)'] == -9999.900391, 0)
 
-    dataframe.to_csv('percipitation-from-hdf.csv', index=False)
+    # dataframe.to_csv('percipitation-from-hdf.csv', index=False)
 
 
 def netCDF_to_csv():
@@ -54,3 +55,5 @@ def netCDF_to_csv():
         dataset['lat'].standard_name, dataset['lat'].units), '{} in {}'.format(dataset['prcp'].long_name, dataset['prcp'].units)]
 
     dataframe.to_csv('percipitation-from-netCDF.csv', index=False)
+
+hdf5_to_csv()

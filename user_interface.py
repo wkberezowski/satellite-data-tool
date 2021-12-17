@@ -28,11 +28,11 @@ def open():
         title_label.grid(row=0, columnspan=2)
 
         name_label = Label(display_frame, text='Name',
-                           background=primary_color, width=50, relief='groove')
-        name_label.grid(row=1, column=0, sticky='nsew')
+                           background=primary_color, width=50)
+        name_label.grid(row=1, column=0, pady=2, sticky='nsew')
         size_label = Label(display_frame, text='Size',
-                           background=primary_color, width=50, relief='groove')
-        size_label.grid(row=1, column=1, sticky='nsew')
+                           background=primary_color, width=50)
+        size_label.grid(row=1, column=1, pady=2, sticky='nsew')
 
         if filename[-4:].lower() == 'hdf5':
             vars, sizes = import_hdf()
@@ -42,12 +42,14 @@ def open():
         for i in range(len(vars)):
             key_label = Label(
                 display_frame, text=vars[i], background=accent_color)
-            key_label.grid(row=i+2, column=0, sticky='nsew', pady=2)
+            key_label.grid(row=i+2, column=0, pady=2, sticky='nsew')
             size_label = Label(
                 display_frame, text=sizes[i], background=accent_color)
-            size_label.grid(row=i+2, column=1, pady=2)
+            size_label.grid(row=i+2, column=1, pady=2, sticky='nsew')
 
         btn_save.config(state=NORMAL)
+
+# SAVING TO CSV
 
 
 def save():
@@ -57,6 +59,8 @@ def save():
         netCDF_to_csv()
 
     messagebox.showinfo('Saving', 'Saved successfuly')
+
+# CLEARING ALL
 
 
 def clear_all():
