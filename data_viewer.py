@@ -1,13 +1,39 @@
 import h5py
+import netCDF4
 import numpy as np
 import pandas as pd
-import netCDF4
 from tkinter import *
 from tkinter import ttk
+from tkinter import messagebox
+from tkinter import filedialog
 
 
-def hdf_handler():
+def display_hdf():
     dataframe = h5py.File('data\gpm_jan_2020.HDF5', 'r')
+    grid = dataframe['Grid']
+    grid_keys = list(grid.keys())
+    sizes = []
+
+    for key in grid_keys:
+        sizes.append(grid[key].size)
+
+    return grid_keys, sizes
+
+
+def display_netcdf():
+    dataframe = netCDF4.Dataset(
+        './data/daymet_v3_prcp_monttl_2017_hi.nc4', 'r', format='NETCDF4')
+    vars = list(dataframe.variables)
+    sizes = []
+
+    for var in vars:
+        sizes.append(dataframe[var].size)
+
+    return vars, sizes
+
+
+def hdf_handler(filename):
+    dataframe = h5py.File(filename, 'r')
 
     grid = dataframe['Grid']
 
@@ -31,15 +57,13 @@ def hdf_handler():
     dataframe['Precipitation (mm/hr)'] = dataframe['Precipitation (mm/hr)'].mask(
         dataframe['Precipitation (mm/hr)'] == -9999.900391, 0)
 
-    # dataframe.to_csv('percipitation-from-hdf.csv', index=False)
-
     return dataframe
 
 
-def netcdf_handler():
+def netcdf_handler(filename):
     # READ DATASET
     dataset = netCDF4.Dataset(
-        './data/daymet_v3_prcp_monttl_2017_hi.nc4', 'r', format='NETCDF4')
+        filename, 'r', format='NETCDF4')
 
     # DONT KNOW IF ITS BETTER TO USE LON/LAT OR Y/X
     lon = dataset['lon'][:, 0]
@@ -57,14 +81,12 @@ def netcdf_handler():
     dataframe.columns = ['{} in {}'.format(dataset['lon'].standard_name, dataset['lon'].units), '{} in {}'.format(
         dataset['lat'].standard_name, dataset['lat'].units), '{} in {}'.format(dataset['prcp'].long_name, dataset['prcp'].units)]
 
-    # dataframe.to_csv('percipitation-from-netCDF.csv', index=False)
-
     return dataframe
 
 
 def dataviewer(dataframe):
     root = Tk()
-    root.title('DataViewer')
+    root.title('Data Viewer')
     root.geometry('800x600')
     root.iconbitmap('./satellite.ico')
 
@@ -91,11 +113,15 @@ def dataviewer(dataframe):
     for row in rows:
         dataviewer.insert('', 'end', values=row)
 
+    def saving():
+        file = filedialog.asksaveasfile(filetypes=[('CSV Files', '*.csv')], defaultextension='*.csv')
+        dataframe.to_csv(file, index=False)
+
+        messagebox.showinfo('Saving', 'Saved successfuly')
+
+    save_as_csv_btn = Button(root, text='Save To Drive', command=saving)
+    save_as_csv_btn.pack(anchor=CENTER)
+
     dataviewer.pack()
 
     root.mainloop()
-
-
-hdf_data = hdf_handler()
-netcdf_data = netcdf_handler()
-# dataviewer(hdf_data)
