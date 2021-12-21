@@ -8,8 +8,8 @@ from tkinter import messagebox
 from tkinter import filedialog
 
 
-def display_hdf():
-    dataframe = h5py.File('data\gpm_jan_2020.HDF5', 'r')
+def display_hdf(filename):
+    dataframe = h5py.File(filename, 'r')
     grid = dataframe['Grid']
     grid_keys = list(grid.keys())
     sizes = []
@@ -20,9 +20,9 @@ def display_hdf():
     return grid_keys, sizes
 
 
-def display_netcdf():
+def display_netcdf(filename):
     dataframe = netCDF4.Dataset(
-        './data/daymet_v3_prcp_monttl_2017_hi.nc4', 'r', format='NETCDF4')
+        filename, 'r', format='NETCDF4')
     vars = list(dataframe.variables)
     sizes = []
 
@@ -117,7 +117,8 @@ def dataviewer(dataframe):
         file = filedialog.asksaveasfile(filetypes=[('CSV Files', '*.csv')], defaultextension='*.csv')
         dataframe.to_csv(file, index=False)
 
-        messagebox.showinfo('Saving', 'Saved successfuly')
+        if file:
+            messagebox.showinfo('Saving', 'Saved successfuly')
 
     save_as_csv_btn = Button(root, text='Save To Drive', command=saving)
     save_as_csv_btn.pack(anchor=CENTER)

@@ -29,9 +29,9 @@ def open():
         size_label.grid(row=1, column=1, pady=2, sticky='nsew')
 
         if filename[-4:].lower() == 'hdf5':
-            vars, sizes = display_hdf()
+            vars, sizes = display_hdf(filename)
         elif filename[-3:-1].lower() == 'nc':
-            vars, sizes = display_netcdf()
+            vars, sizes = display_netcdf(filename)
 
         for i in range(len(vars)):
             key_label = Label(
