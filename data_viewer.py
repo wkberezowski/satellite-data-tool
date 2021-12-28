@@ -120,7 +120,8 @@ def dataviewer(dataframe):
         if file:
             messagebox.showinfo('Saving', 'Saved successfuly')
 
-    save_as_csv_btn = Button(root, text='Save To Drive', command=saving)
+    save_as_csv_btn = Button(root, text='Save To Drive',
+                             command=saving, bg='#DEE2E6')
     save_as_csv_btn.pack(anchor=CENTER)
 
     dataviewer.pack()

@@ -1,5 +1,7 @@
 from tkinter import *
 from tkinter import filedialog
+
+from numpy import add
 from data_viewer import *
 
 
@@ -19,29 +21,64 @@ def open():
 
         title_label = Label(display_frame, text=filename,
                             background=accent_color)
-        title_label.grid(row=0, columnspan=2)
+        title_label.grid(row=0, columnspan=3)
+
+        checkbox_label = Label(display_frame, text='To CSV',
+                               background=primary_color, width=5)
+        checkbox_label.grid(row=1, column=0, pady=2, sticky='nsew')
 
         name_label = Label(display_frame, text='Name',
-                           background=primary_color, width=50)
-        name_label.grid(row=1, column=0, pady=2, sticky='nsew')
+                           background=primary_color, width=40)
+        name_label.grid(row=1, column=1, pady=2, sticky='nsew')
+
         size_label = Label(display_frame, text='Size',
-                           background=primary_color, width=50)
-        size_label.grid(row=1, column=1, pady=2, sticky='nsew')
+                           background=primary_color, width=40)
+        size_label.grid(row=1, column=2, pady=2, sticky='nsew')
 
         if filename[-4:].lower() == 'hdf5':
             vars, sizes = display_hdf(filename)
         elif filename[-3:-1].lower() == 'nc':
             vars, sizes = display_netcdf(filename)
 
-        for i in range(len(vars)):
-            key_label = Label(
-                display_frame, text=vars[i], background=accent_color)
-            key_label.grid(row=i+2, column=0, pady=2, sticky='nsew')
-            size_label = Label(
-                display_frame, text=sizes[i], background=accent_color)
-            size_label.grid(row=i+2, column=1, pady=2, sticky='nsew')
+        states_list = []
+        var1 = StringVar()
+        var2 = StringVar()
+        var3 = StringVar()
 
-        btn_open_as_csv.config(state=NORMAL)
+        varss = [var1, var2, var3]
+
+        for i in range(3):
+            key_checkbox = Checkbutton(display_frame, background=accent_color, width=5, variable=varss[i], command=lambda: myCallback(varss[i]))
+            key_checkbox.grid(row=i+2, column=0, pady=2, sticky='nsew')
+
+            key_label = Label(
+                display_frame, text=vars[i], background=accent_color, width=40)
+            key_label.grid(row=i+2, column=1, pady=2, sticky='nsew')
+
+            size_label = Label(
+                display_frame, text=sizes[i], background=accent_color, width=40)
+            size_label.grid(row=i+2, column=2, pady=2, sticky='nsew')
+
+
+    def myCallback(var):
+        each_var = var.get()
+        print("var is %s", str(each_var))
+
+    def add_to_list():
+        key_list = []
+
+        for item in vars:
+            if item != '':
+                key_list.append(item)
+
+        list_label = Label(display_frame, text=states_list,
+                            background=primary_color)
+        list_label.grid(columnspan=3, pady=2, sticky='nsew')
+
+    add_to_list_btn = Button(display_frame, text='Add To List', background=btns_color, command=add_to_list)
+    add_to_list_btn.grid(columnspan=3, pady=4, sticky='nsew')
+
+    btn_open_as_csv.config(state=NORMAL)
 
 
 # SAVING TO CSV
