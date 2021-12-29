@@ -89,11 +89,12 @@ def dataviewer(dataframe):
     root.title('Data Viewer')
     root.geometry('800x600')
     root.iconbitmap('./satellite.ico')
+    root.configure(background='#F8F9FA')
 
     columns = dataframe.columns
     rows = dataframe.to_numpy().tolist()
 
-    dataviewer_frame = Frame(root)
+    dataviewer_frame = Frame(root, background='#F8F9FA')
     dataviewer_frame.pack(pady=20)
 
     scroll = Scrollbar(dataviewer_frame)
@@ -114,7 +115,8 @@ def dataviewer(dataframe):
         dataviewer.insert('', 'end', values=row)
 
     def saving():
-        file = filedialog.asksaveasfile(filetypes=[('CSV Files', '*.csv')], defaultextension='*.csv')
+        file = filedialog.asksaveasfile(
+            filetypes=[('CSV Files', '*.csv')], defaultextension='*.csv')
         dataframe.to_csv(file, index=False)
 
         if file:
