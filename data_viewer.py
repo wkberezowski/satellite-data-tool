@@ -17,13 +17,17 @@ def dataviewer(dataframe):
     dataviewer_frame = Frame(root, background='#F8F9FA')
     dataviewer_frame.pack(pady=20)
 
-    scroll = Scrollbar(dataviewer_frame)
-    scroll.pack(side=RIGHT, fill=Y)
+    horizontal_scroll = Scrollbar(dataviewer_frame, orient='horizontal')
+    horizontal_scroll.pack(side=BOTTOM, fill=X)
+
+    vertical_scroll = Scrollbar(dataviewer_frame)
+    vertical_scroll.pack(side=RIGHT, fill=Y)
 
     dataviewer = ttk.Treeview(
-        dataviewer_frame, yscrollcommand=scroll.set, selectmode=NONE)
+        dataviewer_frame, xscrollcommand=horizontal_scroll.set, yscrollcommand=vertical_scroll.set, selectmode=NONE)
 
-    scroll.config(command=dataviewer.yview)
+    horizontal_scroll.config(command=dataviewer.xview)
+    vertical_scroll.config(command=dataviewer.yview)
 
     dataviewer['columns'] = list(columns)
     dataviewer['show'] = 'headings'
