@@ -1,13 +1,42 @@
 from tkinter import *
 from tkinter import filedialog
 from data_viewer import *
+import h5py
+import netCDF4
+import pandas as pd
+import numpy as np
 
 
 # IMPORTING HDF5 FILE AND DISPLAYING ITS CONTENT
 
 
+def display_hdf(filename):
+    dataframe = h5py.File(filename, 'r')
+    grid = dataframe['Grid']
+    grid_keys = list(grid.keys())
+    sizes = []
+
+    for key in grid_keys:
+        sizes.append(grid[key].size)
+
+    return grid_keys, sizes
+
+
+def display_netcdf(filename):
+    dataframe = netCDF4.Dataset(
+        filename, 'r', format='NETCDF4')
+    vars = list(dataframe.variables)
+    sizes = []
+
+    for var in vars:
+        sizes.append(dataframe[var].size)
+
+    return vars, sizes
+
+
 def open():
     global filename
+    global add_to_list
     filetypes = (('HDF5 files', '*.HDF5'), ('netCDF files', '*.nc4'))
     filename = filedialog.askopenfilename(
         initialdir='./data', title='Select a file', filetypes=filetypes)
@@ -71,7 +100,7 @@ def open():
                                background=primary_color)
             list_label.grid(columnspan=3, pady=2, sticky='nsew')
 
-            btn_open_as_csv = Button(display_frame, text="Open As CSV", command=open_and_save,
+            btn_open_as_csv = Button(display_frame, text="Open As CSV", command=open_in_dataviewer,
                                      bg=btns_color, width=50)
 
             btn_open_as_csv.grid(columnspan=3, pady=10, sticky='ns')
@@ -81,19 +110,69 @@ def open():
         add_to_list_btn.grid(columnspan=3, pady=10, sticky='ns')
 
 
-# SAVING TO CSV
+# OPENING DATAVIEWER
 
 
-def open_and_save():
+def open_in_dataviewer():
+    list_of_values = add_to_list()
+    print(list_of_values)
+
+    #  HANDLING HDF FILES
+
     if filename[-4:].lower() == 'hdf5':
-        data = hdf_handler(filename)
-        dataviewer(data)
+        dataframe = h5py.File(filename, 'r')
+
+        grid = dataframe['Grid']
+
+        lon_values = list(grid['lon'])
+        lat_values = list(grid['lat'])
+        percip_values = np.array(list(grid['precipitation'])).flatten()
+
+        dataframe = pd.DataFrame({'lon': lon_values[:1000],
+                                  'lat': lat_values[:1000],
+                                  'percip': percip_values[:1000]
+                                  })
+
+        dataframe.columns = [grid['lon'].attrs['standard_name'].decode() +
+                             ' (' + grid['lon'].attrs['units'].decode() + ')',
+                             grid['lat'].attrs['standard_name'].decode(
+        ) + ' (' + grid['lat'].attrs['units'].decode() + ')',
+            'Precipitation (' +
+            grid['precipitation'].attrs['units'].decode() + ')'
+        ]
+
+        dataframe['Precipitation (mm/hr)'] = dataframe['Precipitation (mm/hr)'].mask(
+            dataframe['Precipitation (mm/hr)'] == -9999.900391, 0)
+
+        dataviewer(dataframe)
+
+    # HANDLING NETCDF FILES
+
     elif filename[-3:-1].lower() == 'nc':
-        data = netcdf_handler(filename)
-        dataviewer(data)
+        # READ DATASET
+        dataset = netCDF4.Dataset(
+            filename, 'r', format='NETCDF4')
+
+        # DONT KNOW IF ITS BETTER TO USE LON/LAT OR Y/X
+        lon = dataset['lon'][:, 0]
+        lat = dataset['lat'][0]
+        prcp = dataset['prcp'][0]
+
+        lon_values = np.repeat(list(lon), lat.size)
+        lat_values = list(lat) * lon.size
+        percip_values = np.array(list(prcp)).flatten()
+
+        dataframe = pd.DataFrame({'lon': lon_values[:1000],
+                                  'lat': lat_values[:1000],
+                                  'prcp': percip_values[:1000]})
+
+        dataframe.columns = ['{} in {}'.format(dataset['lon'].standard_name, dataset['lon'].units), '{} in {}'.format(
+            dataset['lat'].standard_name, dataset['lat'].units), '{} in {}'.format(dataset['prcp'].long_name, dataset['prcp'].units)]
+
+        dataviewer(dataframe)
 
 
-# CLEARING ALL
+# CLEARING APP SCREEN
 
 
 def clear_all():
