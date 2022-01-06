@@ -49,7 +49,7 @@ def open():
 
         if any(substring in filename.lower() for substring in hdf_names):
             vars, sizes = display_hdf(filename)
-            
+
         elif any(substring in filename.lower() for substring in netcdf_names):
             vars, sizes = display_netcdf(filename)
 
@@ -103,7 +103,7 @@ def open():
 
         # OPEN IN DATAVIEWER BUTTON
 
-        btn_open_in_dataviewer = Button(display_frame, text="Open As CSV", command=open_in_dataviewer,
+        btn_open_in_dataviewer = Button(display_frame, text="Open In DataViewer", command=open_in_dataviewer,
                                         bg=btns_color, width=50, state=DISABLED)
         btn_open_in_dataviewer.grid(columnspan=3, pady=10, sticky='ns')
 
@@ -113,7 +113,7 @@ def open():
         clicked.set('500')
         dropdown = OptionMenu(display_frame, clicked, '500', '1000', '1500')
         dropdown.config(bg=btns_color)
-        dropdown.grid(column=2, row=len(vars) + 4, padx=5, pady=10, sticky='w')
+        dropdown.grid(column=2, row=len(vars) + 4, sticky='w')
 
 # DISPLAYING THE STRUCTURE OF HDF FILE
 
@@ -239,7 +239,7 @@ btn_open = Button(btns_frame, text="Open",
                   command=open, bg=btns_color)
 btn_open.grid(row=0, column=0, sticky='nsew', padx=10, pady=5)
 
-btn_clear = Button(btns_frame, text="Clear All",
+btn_clear = Button(btns_frame, text="Close File",
                    command=clear_all, bg=btns_color)
 btn_clear.grid(row=1, column=0, sticky='nsew', padx=10, pady=5)
 
