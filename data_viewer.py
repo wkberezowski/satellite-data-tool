@@ -3,6 +3,8 @@ from tkinter import ttk
 from tkinter import messagebox
 from tkinter import filedialog
 
+# DATAVIEWER
+
 
 def dataviewer(dataframe):
     root = Tk()
@@ -38,10 +40,12 @@ def dataviewer(dataframe):
     for row in rows:
         dataviewer.insert('', 'end', values=row)
 
+    # SAVING TO CSV
+
     def saving():
         file = filedialog.asksaveasfile(
             filetypes=[('CSV Files', '*.csv')], defaultextension='*.csv')
-        dataframe.to_csv(file, index=False)
+        dataframe.to_csv(file, index=False, line_terminator='\n')
 
         if file:
             messagebox.showinfo('Saving', 'Saved successfuly')
