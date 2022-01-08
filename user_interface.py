@@ -17,6 +17,7 @@ def open():
     global filename
     global add_to_list
     global clicked
+    global clear_checkboxes
     filetypes = [('HDF5 files', '*.HDF5'),
                  ('HDF5 files', '*.h5'),
                  ('netCDF files', '*.nc4'),
@@ -56,6 +57,7 @@ def open():
         # CREATING CHECKBUTTONS
 
         checkbuttons = {}
+        checkbox_list = []
 
         for i in range(len(vars)):
             key_checkbox = Checkbutton(
@@ -63,6 +65,7 @@ def open():
             key_checkbox.grid(row=i+2, column=0, pady=2, sticky='nsew')
 
             checkbuttons[i] = key_checkbox
+            checkbox_list.append(key_checkbox)
 
             key_label = Label(
                 display_frame, text=vars[i], background=accent_color)
@@ -71,6 +74,12 @@ def open():
             size_label = Label(
                 display_frame, text=sizes[i], background=accent_color)
             size_label.grid(row=i+2, column=2, pady=2, sticky='nsew')
+
+        # CLEARING CHECKBOXES
+
+        def clear_checkboxes():
+            for i in checkbox_list:
+                i.deselect()
 
         # ADDING CHECKED ITEMS TO LIST
 
@@ -92,20 +101,26 @@ def open():
             list_label.configure(text='{}'.format(value_list))
             btn_open_in_dataviewer.configure(state=NORMAL)
 
+        # CLEAR CHECKBOXES BUTTON
+
+        btn_clear_checkboxes = Button(
+            display_frame, text='Clear', command=clear_checkboxes, bg=btns_color, width=5)
+        btn_clear_checkboxes.grid(row=len(vars) + 2, sticky='ns', pady=10)
+
         # ADD TO LIST BUTTON
 
         add_to_list_btn = Button(display_frame, text='Add To List',
-                                 background=btns_color, width=50, command=show_list)
-        add_to_list_btn.grid(columnspan=3, pady=10, sticky='ns')
+                                 background=btns_color, width=30, command=show_list)
+        add_to_list_btn.grid(row=len(vars) + 2, column=1, pady=10, sticky='ns')
 
         list_label = Label(display_frame, background=primary_color)
-        list_label.grid(columnspan=3, pady=2, sticky='nsew')
+        list_label.grid(row=len(vars) + 3, columnspan=3, sticky='nsew')
 
         # OPEN IN DATAVIEWER BUTTON
 
         btn_open_in_dataviewer = Button(display_frame, text="Open In DataViewer", command=open_in_dataviewer,
-                                        bg=btns_color, width=50, state=DISABLED)
-        btn_open_in_dataviewer.grid(columnspan=3, pady=10, sticky='ns')
+                                        bg=btns_color, width=30, state=DISABLED)
+        btn_open_in_dataviewer.grid(row=len(vars) + 4,  pady=10, sticky='ns')
 
         # SELECTING THE NUMBER OF ROWS
 
@@ -113,7 +128,7 @@ def open():
         clicked.set('500')
         dropdown = OptionMenu(display_frame, clicked, '500', '1000', '1500')
         dropdown.config(bg=btns_color)
-        dropdown.grid(column=2, row=len(vars) + 4, sticky='w')
+        dropdown.grid(column=1, row=len(vars) + 4, sticky='e', padx=20)
 
 # DISPLAYING THE STRUCTURE OF HDF FILE
 
@@ -193,7 +208,7 @@ def open_in_dataviewer():
 # CLEARING APP SCREEN
 
 
-def clear_all():
+def close_file():
     for label in display_frame.grid_slaves():
         label.grid_forget()
 
@@ -209,7 +224,7 @@ root.title('Satellite Data Tool')
 root.iconbitmap('./satellite.ico')
 
 app_width = 1200
-app_height = 600
+app_height = 650
 
 screen_width = root.winfo_screenwidth()
 screen_height = root.winfo_screenheight()
@@ -236,12 +251,12 @@ display_frame.grid(row=0, column=1, sticky='nsew')
 btns_frame.columnconfigure(0, weight=1)
 
 btn_open = Button(btns_frame, text="Open",
-                  command=open, bg=btns_color)
-btn_open.grid(row=0, column=0, sticky='nsew', padx=10, pady=5)
+                  command=open, bg=btns_color, width=15)
+btn_open.grid(row=0, column=0, sticky='ns', padx=10, pady=7)
 
-btn_clear = Button(btns_frame, text="Close File",
-                   command=clear_all, bg=btns_color)
-btn_clear.grid(row=1, column=0, sticky='nsew', padx=10, pady=5)
+btn_close = Button(btns_frame, text="Close File",
+                   command=close_file, bg=btns_color, width=15)
+btn_close.grid(row=1, column=0, sticky='ns', padx=10, pady=7)
 
 
 # SETTING UP LABELS FOR DISPLAYING THE CONTNET OF THE FILE
