@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter import filedialog
+from tkinter import font
 from data_viewer import *
 import h5py
 import netCDF4
@@ -98,29 +99,31 @@ def open():
 
         def show_list():
             value_list = add_to_list()
-            list_label.configure(text='{}'.format(value_list))
+            list_label.configure(text='{}'.format(value_list), font='Helvetica 9')
             btn_open_in_dataviewer.configure(state=NORMAL)
-
-        # CLEAR CHECKBOXES BUTTON
-
-        btn_clear_checkboxes = Button(
-            display_frame, text='Clear', command=clear_checkboxes, bg=btns_color, width=5)
-        btn_clear_checkboxes.grid(row=len(vars) + 2, sticky='ns', pady=10)
 
         # ADD TO LIST BUTTON
 
         add_to_list_btn = Button(display_frame, text='Add To List',
-                                 background=btns_color, width=30, command=show_list)
-        add_to_list_btn.grid(row=len(vars) + 2, column=1, pady=10, sticky='ns')
+                                 background=btns_color, width=10, command=show_list)
+        add_to_list_btn.grid(row=len(vars) + 2, column=0, pady=5, sticky='ns')
 
-        list_label = Label(display_frame, background=primary_color)
-        list_label.grid(row=len(vars) + 3, columnspan=3, sticky='nsew')
+        # CLEAR CHECKBOXES BUTTON
+
+        btn_clear_checkboxes = Button(
+            display_frame, text='Clear', command=clear_checkboxes, bg=btns_color, width=10)
+        btn_clear_checkboxes.grid(row=len(vars) + 3, sticky='ns', pady=5)
+
+        list_label = Label(display_frame, text='Columns in DataViewer', background=primary_color)
+        list_label.grid(row=len(vars) + 4, columnspan=3, sticky='nsew')
+        list_label.configure(font='Helvetica 9 italic')
 
         # OPEN IN DATAVIEWER BUTTON
 
-        btn_open_in_dataviewer = Button(display_frame, text="Open In DataViewer", command=open_in_dataviewer,
-                                        bg=btns_color, width=30, state=DISABLED)
-        btn_open_in_dataviewer.grid(row=len(vars) + 4,  pady=10, sticky='ns')
+        btn_open_in_dataviewer = Button(display_frame, text="Open In DataViewer",
+                                        command=open_in_dataviewer, bg=btns_color, width=20, state=DISABLED)
+        btn_open_in_dataviewer.grid(
+            row=len(vars) + 5, columnspan=3, pady=10, sticky='ns')
 
         # SELECTING THE NUMBER OF ROWS
 
@@ -128,7 +131,7 @@ def open():
         clicked.set('500')
         dropdown = OptionMenu(display_frame, clicked, '500', '1000', '1500')
         dropdown.config(bg=btns_color)
-        dropdown.grid(column=1, row=len(vars) + 4, sticky='e', padx=20)
+        dropdown.grid(row=len(vars) + 5, column=1, padx=175, sticky='e')
 
 # DISPLAYING THE STRUCTURE OF HDF FILE
 
@@ -230,7 +233,7 @@ screen_width = root.winfo_screenwidth()
 screen_height = root.winfo_screenheight()
 
 x = (screen_width / 2) - (app_width / 2)
-y = (screen_height / 2) - (app_height / 2)
+y = (screen_height / 2.25) - (app_height / 2)
 
 menu = 100
 display = app_width - menu
@@ -260,8 +263,8 @@ btn_close.grid(row=1, column=0, sticky='ns', padx=10, pady=7)
 
 
 # SETTING UP LABELS FOR DISPLAYING THE CONTNET OF THE FILE
-display_frame.columnconfigure(0, weight=1)
-display_frame.columnconfigure(1, weight=10)
-display_frame.columnconfigure(2, weight=5)
+display_frame.columnconfigure(0, weight=3)
+display_frame.columnconfigure(1, weight=4)
+display_frame.columnconfigure(2, weight=3)
 
 root.mainloop()
