@@ -136,8 +136,9 @@ def open():
         # SELECTING THE NUMBER OF ROWS
 
         clicked = StringVar()
-        clicked.set('500')
-        dropdown = OptionMenu(display_frame, clicked, '500', '1000', '1500')
+        clicked.set('ALL')
+        dropdown = OptionMenu(display_frame, clicked,
+                              '500', '1000', '1500', 'ALL')
         dropdown.config(bg=btns_color)
         dropdown.grid(row=len(vars) + 5, column=1, padx=175, sticky='e')
 
@@ -195,8 +196,15 @@ def open_in_dataviewer():
                 for i in range(len(list_of_values)):
                     this_column = dataframe.columns[i]
 
-                    dataframe[this_column] = np.array(
-                        list(grid['{}'.format(list_of_values[i])])).flatten()[:int(clicked.get())]
+                    if clicked.get() == 'ALL':
+                        dataframe[this_column] = pd.Series(np.array(
+                            list(grid['{}'.format(list_of_values[i])])).flatten())
+                    else:
+                        dataframe[this_column] = pd.Series(np.array(
+                            list(grid['{}'.format(list_of_values[i])])).flatten()[:int(clicked.get())])
+
+                    dataframe[this_column] = dataframe[this_column].mask(
+                        dataframe[this_column] < -9990)
 
                 dataviewer(dataframe)
 
@@ -211,8 +219,16 @@ def open_in_dataviewer():
 
                 for i in range(len(list_of_values)):
                     this_column = dataframe.columns[i]
-                    dataframe[this_column] = np.array(
-                        list(dataset['{}'.format(list_of_values[i])])).flatten()[:int(clicked.get())]
+
+                    if clicked.get() == 'ALL':
+                        dataframe[this_column] = pd.Series(np.array(
+                            list(dataset['{}'.format(list_of_values[i])])).flatten())
+                    else:
+                        dataframe[this_column] = pd.Series(np.array(
+                            list(dataset['{}'.format(list_of_values[i])])).flatten()[:int(clicked.get())])
+
+                    dataframe[this_column] = dataframe[this_column].mask(
+                        dataframe[this_column] < -9990)
 
                 dataviewer(dataframe)
 
@@ -228,6 +244,7 @@ def close_file():
         label.grid_forget()
 
 
+# SETTING UP MAIN WINDOW
 # DEFINING COLORS
 primary_color = '#F8F9FA'
 accent_color = '#E9ECEF'
@@ -238,8 +255,8 @@ root = Tk()
 root.title('Satellite Data Tool')
 root.iconbitmap('./satellite.ico')
 
-app_width = 1200
-app_height = 650
+app_width = 1500
+app_height = 750
 
 screen_width = root.winfo_screenwidth()
 screen_height = root.winfo_screenheight()
@@ -254,7 +271,7 @@ root.geometry('{}x{}+{}+{}'.format(app_width, app_height, int(x), int(y)))
 
 # SETTING UP GRID, FRAMES AND BUTTONS
 root.rowconfigure(0,  weight=1)
-root.columnconfigure(0, minsize=25,  weight=1)
+root.columnconfigure(0,  weight=1)
 root.columnconfigure(1,  weight=20)
 
 btns_frame = Frame(root, background=primary_color)
@@ -269,9 +286,13 @@ btn_open = Button(btns_frame, text="Open",
                   command=open, bg=btns_color, width=15)
 btn_open.grid(row=0, column=0, sticky='ns', padx=10, pady=7)
 
-btn_close = Button(btns_frame, text="Close File",
-                   command=close_file, bg=btns_color, width=15)
-btn_close.grid(row=1, column=0, sticky='ns', padx=10, pady=7)
+btn_close_file = Button(btns_frame, text="Close File",
+                        command=close_file, bg=btns_color, width=15)
+btn_close_file.grid(row=1, column=0, sticky='ns', padx=10, pady=7)
+
+btn_close_app = Button(btns_frame, text='Close App',
+                       command=root.destroy, bg=btns_color, width=15)
+btn_close_app.grid(row=2, column=0, sticky='ns', padx=10, pady=7)
 
 
 # SETTING UP LABELS FOR DISPLAYING THE CONTNET OF THE FILE
