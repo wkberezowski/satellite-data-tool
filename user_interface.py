@@ -81,6 +81,8 @@ def open():
         def clear_checkboxes():
             for i in checkbox_list:
                 i.deselect()
+            list_label.configure(
+                text='Columns in DataViewer', font='Helvetica 9 italic')
 
         # ADDING CHECKED ITEMS TO LIST
 
@@ -99,8 +101,13 @@ def open():
 
         def show_list():
             value_list = add_to_list()
-            list_label.configure(text='{}'.format(value_list), font='Helvetica 9')
-            btn_open_in_dataviewer.configure(state=NORMAL)
+            if len(value_list) < 1:
+                messagebox.showwarning(
+                    title='ERROR', message='There is nothing to add to the list')
+            else:
+                list_label.configure(text='{}'.format(
+                    value_list), font='Helvetica 9')
+                btn_open_in_dataviewer.configure(state=NORMAL)
 
         # ADD TO LIST BUTTON
 
@@ -114,7 +121,8 @@ def open():
             display_frame, text='Clear', command=clear_checkboxes, bg=btns_color, width=10)
         btn_clear_checkboxes.grid(row=len(vars) + 3, sticky='ns', pady=5)
 
-        list_label = Label(display_frame, text='Columns in DataViewer', background=primary_color)
+        list_label = Label(
+            display_frame, text='Columns in DataViewer', background=primary_color)
         list_label.grid(row=len(vars) + 4, columnspan=3, sticky='nsew')
         list_label.configure(font='Helvetica 9 italic')
 
@@ -168,44 +176,48 @@ def display_netcdf(filename):
 def open_in_dataviewer():
     list_of_values = add_to_list()
 
-    try:
+    if len(list_of_values) < 1:
+        messagebox.showwarning(
+            title='ERROR', message='There is nothing added to the list')
+    else:
+        try:
 
-        #  HANDLING HDF FILES
+            #  HANDLING HDF FILES
 
-        if any(substring in filename.lower() for substring in hdf_names):
+            if any(substring in filename.lower() for substring in hdf_names):
 
-            dataset = h5py.File(filename, 'r')
+                dataset = h5py.File(filename, 'r')
 
-            grid = dataset['Grid']
+                grid = dataset['Grid']
 
-            dataframe = pd.DataFrame(columns=list_of_values)
+                dataframe = pd.DataFrame(columns=list_of_values)
 
-            for i in range(len(list_of_values)):
-                this_column = dataframe.columns[i]
+                for i in range(len(list_of_values)):
+                    this_column = dataframe.columns[i]
 
-                dataframe[this_column] = np.array(
-                    list(grid['{}'.format(list_of_values[i])])).flatten()[:int(clicked.get())]
+                    dataframe[this_column] = np.array(
+                        list(grid['{}'.format(list_of_values[i])])).flatten()[:int(clicked.get())]
 
-            dataviewer(dataframe)
+                dataviewer(dataframe)
 
-        # HANDLING NETCDF FILES
+            # HANDLING NETCDF FILES
 
-        elif any(substring in filename.lower() for substring in netcdf_names):
+            elif any(substring in filename.lower() for substring in netcdf_names):
 
-            dataset = netCDF4.Dataset(
-                filename, 'r', format='NETCDF4')
+                dataset = netCDF4.Dataset(
+                    filename, 'r', format='NETCDF4')
 
-            dataframe = pd.DataFrame(columns=list_of_values)
+                dataframe = pd.DataFrame(columns=list_of_values)
 
-            for i in range(len(list_of_values)):
-                this_column = dataframe.columns[i]
-                dataframe[this_column] = np.array(
-                    list(dataset['{}'.format(list_of_values[i])])).flatten()[:int(clicked.get())]
+                for i in range(len(list_of_values)):
+                    this_column = dataframe.columns[i]
+                    dataframe[this_column] = np.array(
+                        list(dataset['{}'.format(list_of_values[i])])).flatten()[:int(clicked.get())]
 
-            dataviewer(dataframe)
+                dataviewer(dataframe)
 
-    except ValueError as err:
-        messagebox.showerror('ERROR', '{}'.format(err))
+        except ValueError as err:
+            messagebox.showerror('ERROR', '{}'.format(err))
 
 
 # CLEARING APP SCREEN
