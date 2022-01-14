@@ -81,8 +81,6 @@ def open():
         def clear_checkboxes():
             for i in checkbox_list:
                 i.deselect()
-            list_label.configure(
-                text='Columns in DataViewer', font='Helvetica 9 italic')
 
         # ADDING CHECKED ITEMS TO LIST
 
@@ -97,39 +95,16 @@ def open():
                     value_list.append(value)
             return value_list
 
-        # SHOWING LIST ON THE SCREEN
-
-        def show_list():
-            value_list = add_to_list()
-            if len(value_list) < 1:
-                messagebox.showwarning(
-                    title='ERROR', message='There is nothing to add to the list')
-            else:
-                list_label.configure(text='{}'.format(
-                    value_list), font='Helvetica 9')
-                btn_open_in_dataviewer.configure(state=NORMAL)
-
-        # ADD TO LIST BUTTON
-
-        add_to_list_btn = Button(display_frame, text='Add To List',
-                                 background=btns_color, width=10, command=show_list)
-        add_to_list_btn.grid(row=len(vars) + 2, column=0, pady=5, sticky='ns')
-
         # CLEAR CHECKBOXES BUTTON
 
         btn_clear_checkboxes = Button(
             display_frame, text='Clear', command=clear_checkboxes, bg=btns_color, width=10)
         btn_clear_checkboxes.grid(row=len(vars) + 3, sticky='ns', pady=5)
 
-        list_label = Label(
-            display_frame, text='Columns in DataViewer', background=primary_color)
-        list_label.grid(row=len(vars) + 4, columnspan=3, sticky='nsew')
-        list_label.configure(font='Helvetica 9 italic')
-
         # OPEN IN DATAVIEWER BUTTON
 
         btn_open_in_dataviewer = Button(display_frame, text="Open In DataViewer",
-                                        command=open_in_dataviewer, bg=btns_color, width=20, state=DISABLED)
+                                        command=open_in_dataviewer, bg=btns_color, width=20)
         btn_open_in_dataviewer.grid(
             row=len(vars) + 5, columnspan=3, pady=10, sticky='ns')
 
@@ -234,15 +209,31 @@ def open_in_dataviewer():
 
                 dataframe = pd.DataFrame(columns=list_of_values)
 
-                for i in range(len(list_of_values)):
-                    this_column = dataframe.columns[i]
+                if dataset.groups:
+                    if 'PRODUCT' in list(dataset.groups):
+                        for i in range(len(list_of_values)):
+                            this_column = dataframe.columns[i]
 
-                    if clicked.get() == 'ALL':
-                        dataframe[this_column] = pd.Series(np.array(
-                            list(dataset['{}'.format(list_of_values[i])])).flatten())
-                    else:
-                        dataframe[this_column] = pd.Series(np.array(
-                            list(dataset['{}'.format(list_of_values[i])])).flatten()[:int(clicked.get())])
+                            if clicked.get() == 'ALL':
+                                dataframe[this_column] = pd.Series(np.array(
+                                    list(dataset['PRODUCT']['{}'.format(list_of_values[i])])).flatten())
+                            else:
+                                dataframe[this_column] = pd.Series(np.array(
+                                    list(dataset['PRODUCT']['{}'.format(list_of_values[i])])).flatten()[:int(clicked.get())])
+
+                            dataframe[this_column] = dataframe[this_column].mask(
+                                dataframe[this_column] < -9990)
+
+                else:
+                    for i in range(len(list_of_values)):
+                        this_column = dataframe.columns[i]
+
+                        if clicked.get() == 'ALL':
+                            dataframe[this_column] = pd.Series(np.array(
+                                list(dataset['{}'.format(list_of_values[i])])).flatten())
+                        else:
+                            dataframe[this_column] = pd.Series(np.array(
+                                list(dataset['{}'.format(list_of_values[i])])).flatten()[:int(clicked.get())])
 
                     dataframe[this_column] = dataframe[this_column].mask(
                         dataframe[this_column] < -9990)
