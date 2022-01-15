@@ -6,7 +6,7 @@ import pandas as pd
 import numpy as np
 
 
-def dataviewer_screen(list_of_values, filename, hdf_names, netcdf_names, clicked):
+def dataviewer_display(list_of_values, filename, hdf_names, netcdf_names, clicked):
 
     if len(list_of_values) < 1:
         messagebox.showwarning(

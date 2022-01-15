@@ -3,7 +3,7 @@ from tkinter import filedialog
 import h5py
 import netCDF4
 
-from dataviewer_screen import dataviewer_screen
+from dataviewer_display import dataviewer_display
 
 
 # DEFINING FILE EXTENSION
@@ -190,7 +190,7 @@ def open():
                 return value_list
 
             list_of_values = add_to_list()
-            dataviewer_screen(list_of_values, filename,
+            dataviewer_display(list_of_values, filename,
                               hdf_names, netcdf_names, clicked)
 
         # OPEN IN DATAVIEWER BUTTON
