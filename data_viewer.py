@@ -22,7 +22,7 @@ def dataviewer(dataframe):
     y = (screen_height / 2.25) - (app_height / 2)
 
     root.geometry('{}x{}+{}+{}'.format(app_width, app_height, int(x), int(y)))
-    root.iconbitmap('./satellite.ico')
+    root.iconbitmap('./images/satellite.ico')
     root.configure(background='#F8F9FA')
 
     columns = dataframe.columns
@@ -98,8 +98,8 @@ def dataviewer(dataframe):
 
     statistics_table.pack()
 
-    if FutureWarning:
-        messagebox.showwarning(
-            title='ERROR', message='One of the variables in the file is in text format. Cannot show the statistics for that variable properly!')
+    # if FutureWarning:
+    #     messagebox.showwarning(
+    #         title='ERROR', message='One of the variables in the file is in text format. Cannot show the statistics for that variable properly!')
 
     root.mainloop()
