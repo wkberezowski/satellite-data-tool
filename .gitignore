@@ -1,8 +1,0 @@
-venv
-*.h5
-requirements.txt
-*.csv
-__pycache__
-.vscode
-zanieczyszczenie-co-wiekszy.nc
-netcdf.py
