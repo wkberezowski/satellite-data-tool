@@ -1,9 +1,9 @@
-from cgitb import text
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
 from tkinter import filedialog
-import pandas as pd
+# import warnings
+# warnings.filterwarnings("ignore")
 
 # DATAVIEWER
 
@@ -29,7 +29,7 @@ def dataviewer(dataframe):
     rows = dataframe.to_numpy().tolist()
 
     dataviewer_frame = Frame(root, background='#F8F9FA')
-    dataviewer_frame.pack(pady=20)
+    dataviewer_frame.pack(pady=10)
 
     horizontal_scroll = Scrollbar(dataviewer_frame, orient='horizontal')
     horizontal_scroll.pack(side=BOTTOM, fill=X)
@@ -66,11 +66,11 @@ def dataviewer(dataframe):
 
     count_label = Label(root, text='Displaying {} rows'.format(
         len(list_of_children)), bg='#F8F9FA')
-    count_label.pack(pady=10)
+    count_label.pack(pady=5)
 
     save_as_csv_btn = Button(root, text='Save To Drive',
                              command=saving, bg='#DEE2E6')
-    save_as_csv_btn.pack(pady=10)
+    save_as_csv_btn.pack(pady=5)
 
     dataviewer.pack()
 
@@ -83,12 +83,11 @@ def dataviewer(dataframe):
         ['SKEWNESS', *list(dataframe.skew())],
         ['KURTOSIS', *list(dataframe.kurtosis())],
     ]
-
     statistics_frame = Frame(root)
     statistics_frame.pack()
 
     statistics_table = ttk.Treeview(statistics_frame)
-    statistics_table['columns'] = ['STATISTIC', *list(columns)]
+    statistics_table['columns'] = ['statistic', *list(columns)]
     statistics_table['show'] = 'headings'
 
     for column in statistics_table['columns']:
@@ -98,5 +97,9 @@ def dataviewer(dataframe):
         statistics_table.insert('', 'end', values=row)
 
     statistics_table.pack()
+
+    if FutureWarning:
+        messagebox.showwarning(
+            title='ERROR', message='One of the variables in the file is in text format. Cannot show the statistics for that variable properly!')
 
     root.mainloop()

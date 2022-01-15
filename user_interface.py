@@ -2,7 +2,6 @@ from tkinter import *
 from tkinter import filedialog
 import h5py
 import netCDF4
-
 from dataviewer_display import dataviewer_display
 
 
@@ -19,7 +18,15 @@ btns_color = '#DEE2E6'
 # SETTING UP WINDOWS
 root = Tk()
 root.title('Satellite Data Tool')
-root.iconbitmap('./satellite.ico')
+root.iconbitmap('./images/satellite.ico')
+
+# IMAGES
+
+list_of_images = [PhotoImage(file='./images/2-d-plot.png'),
+                  PhotoImage(file='./images/3-d-plot.png'),
+                  PhotoImage(file='./images/histogram.png'),
+                  PhotoImage(file='./images/q-q-plot.png'),
+                  PhotoImage(file='./images/scatter-plot.png')]
 
 app_width = 1500
 app_height = 750
@@ -57,7 +64,6 @@ display_frame.columnconfigure(2, weight=3)
 # FUNCTION FOR OPENING A FILE
 
 def open():
-
     filetypes = [('HDF5 files', '*.HDF5'),
                  ('HDF5 files', '*.h5'),
                  ('netCDF files', '*.nc4'),
@@ -199,6 +205,28 @@ def open():
                                         command=open_in_dataviewer, bg=btns_color, width=20)
         btn_open_in_dataviewer.grid(
             row=len(vars) + 2, columnspan=3, pady=10)
+
+        # BUTTONS FOR PLOTS
+
+        btn_2d_plot = Button(
+            display_frame, image=list_of_images[0], text='2D-Plot', compound=TOP, bg=btns_color)
+        btn_2d_plot.grid(row=len(vars) + 3, column=0, pady=5)
+
+        btn_3d_plot = Button(
+            display_frame, image=list_of_images[1], text='3D-Plot', compound=TOP, bg=btns_color)
+        btn_3d_plot.grid(row=len(vars) + 4, column=0, pady=5)
+
+        btn_histogram = Button(
+            display_frame, image=list_of_images[2], text='Histogram', compound=TOP, bg=btns_color)
+        btn_histogram.grid(row=len(vars) + 3, column=1, pady=5)
+
+        btn_qq_plot = Button(
+            display_frame, image=list_of_images[3], text='Q-Q-Plot', compound=TOP, bg=btns_color)
+        btn_qq_plot.grid(row=len(vars) + 4, column=1, pady=5)
+
+        btn_scatter_plot = Button(
+            display_frame, image=list_of_images[4], text='Scatter-Plot', compound=TOP, bg=btns_color)
+        btn_scatter_plot.grid(row=len(vars) + 3, column=2, pady=5)
 
 
 #  BUTTON FOR OPENING A FILE
