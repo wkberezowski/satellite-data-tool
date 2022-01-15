@@ -1,7 +1,9 @@
+from cgitb import text
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
 from tkinter import filedialog
+import pandas as pd
 
 # DATAVIEWER
 
@@ -62,13 +64,39 @@ def dataviewer(dataframe):
         if file:
             messagebox.showinfo('Saving', 'Saved successfuly')
 
-    count_label = Label(root, text='Displaying {} rows'.format(len(list_of_children)), bg='#F8F9FA')
-    count_label.pack(pady=5)
+    count_label = Label(root, text='Displaying {} rows'.format(
+        len(list_of_children)), bg='#F8F9FA')
+    count_label.pack(pady=10)
 
     save_as_csv_btn = Button(root, text='Save To Drive',
                              command=saving, bg='#DEE2E6')
-    save_as_csv_btn.pack()
+    save_as_csv_btn.pack(pady=10)
 
     dataviewer.pack()
+
+    statistics = [
+        ['MIN', *list(dataframe.min())],
+        ['MAX', *list(dataframe.max())],
+        ['MEAN', *list(dataframe.mean())],
+        ['STANDARD DEVIATION', *list(dataframe.std())],
+        ['VARIANCE', *list(dataframe.var())],
+        ['SKEWNESS', *list(dataframe.skew())],
+        ['KURTOSIS', *list(dataframe.kurtosis())],
+    ]
+
+    statistics_frame = Frame(root)
+    statistics_frame.pack()
+
+    statistics_table = ttk.Treeview(statistics_frame)
+    statistics_table['columns'] = ['STATISTIC', *list(columns)]
+    statistics_table['show'] = 'headings'
+
+    for column in statistics_table['columns']:
+        statistics_table.heading(column, text=column)
+
+    for row in statistics:
+        statistics_table.insert('', 'end', values=row)
+
+    statistics_table.pack()
 
     root.mainloop()

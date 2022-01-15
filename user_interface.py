@@ -144,7 +144,7 @@ def open():
         elif any(substring in filename.lower() for substring in netcdf_names):
             dataset = netCDF4.Dataset(filename, 'r', format='NETCDF4')
 
-            if dataset['PRODUCT']:
+            if dataset.groups:
                 product = dataset['PRODUCT']
                 vars = list(product.variables)
                 sizes = []
@@ -191,7 +191,7 @@ def open():
 
             list_of_values = add_to_list()
             dataviewer_display(list_of_values, filename,
-                              hdf_names, netcdf_names, clicked)
+                               hdf_names, netcdf_names, clicked)
 
         # OPEN IN DATAVIEWER BUTTON
 
