@@ -1,0 +1,8 @@
+venv
+*.h5
+requirements.txt
+*.csv
+__pycache__
+.vscode
+co_2.nc
+netcdf.py
