@@ -1,15 +1,12 @@
 from tkinter import *
 from tkinter import filedialog
-from data_viewer import *
 import h5py
 import netCDF4
-import pandas as pd
-import numpy as np
-from data_viewer import *
+
+from dataviewer_screen import dataviewer_screen
 
 
-# DEFINING FILE EXTENSIONS
-
+# DEFINING FILE EXTENSION
 hdf_names = ['.h5', '.hdf5']
 netcdf_names = ['.nc4', '.nc']
 
@@ -57,6 +54,8 @@ display_frame.columnconfigure(1, weight=4)
 display_frame.columnconfigure(2, weight=3)
 
 
+# FUNCTION FOR OPENING A FILE
+
 def open():
 
     filetypes = [('HDF5 files', '*.HDF5'),
@@ -95,11 +94,11 @@ def open():
 
         # FUNCTION FOR DISPLAYING GENERAL CONTENT OF A FILE
 
-        def display_content(vars, sizes, occupied_rows):
+        def display_content(vars, sizes):
             for i in range(len(vars)):
                 var_checkbox = Checkbutton(
                     display_frame, background=accent_color, onvalue=vars[i], offvalue='')
-                var_checkbox.grid(row=i+occupied_rows, column=0,
+                var_checkbox.grid(row=i+2, column=0,
                                   pady=2, sticky='nsew')
 
                 checkboxes[i] = var_checkbox
@@ -107,12 +106,12 @@ def open():
 
                 key_label = Label(
                     display_frame, text=vars[i], background=accent_color)
-                key_label.grid(row=i+occupied_rows, column=1,
+                key_label.grid(row=i+2, column=1,
                                pady=2, sticky='nsew')
 
                 size_label = Label(
                     display_frame, text=sizes[i], background=accent_color)
-                size_label.grid(row=i+occupied_rows, column=2,
+                size_label.grid(row=i+2, column=2,
                                 pady=2, sticky='nsew')
 
             # CLEARING CHECKBOXES FUNCTION
@@ -129,8 +128,6 @@ def open():
 
         # DISPLAYING HDF FILE
 
-        occupied_rows = 2
-
         if any(substring in filename.lower() for substring in hdf_names):
             dataset = h5py.File(filename, 'r')
             grid = dataset['Grid']
@@ -140,20 +137,31 @@ def open():
             for var in vars:
                 sizes.append(grid[var].size)
 
-            display_content(vars, sizes, occupied_rows)
+            display_content(vars, sizes)
 
         # DISPLAYING NETCDF FILE
 
         elif any(substring in filename.lower() for substring in netcdf_names):
             dataset = netCDF4.Dataset(filename, 'r', format='NETCDF4')
 
-            vars = list(dataset.variables)
-            sizes = []
+            if dataset['PRODUCT']:
+                product = dataset['PRODUCT']
+                vars = list(product.variables)
+                sizes = []
 
-            for var in vars:
-                sizes.append(dataset[var].size)
+                for var in vars:
+                    sizes.append(product[var].size)
 
-            display_content(vars, sizes, occupied_rows)
+                display_content(vars, sizes)
+
+            else:
+                vars = list(dataset.variables)
+                sizes = []
+
+                for var in vars:
+                    sizes.append(dataset[var].size)
+
+                display_content(vars, sizes)
 
         # OPTIONS FOR DROPDOWN MENU
         options = ['ALL',
@@ -166,6 +174,8 @@ def open():
         dropdown = OptionMenu(display_frame, clicked, *options)
         dropdown.config(bg=btns_color)
         dropdown.grid(row=len(vars) + 2, column=1, padx=175, sticky='e')
+
+        # OPENING IN DATAVIEWER
 
         def open_in_dataviewer():
             def add_to_list():
@@ -180,62 +190,15 @@ def open():
                 return value_list
 
             list_of_values = add_to_list()
-            if len(list_of_values) < 1:
-                messagebox.showwarning(
-                    title='ERROR', message='There is nothing added to the list')
-            else:
-                try:
+            dataviewer_screen(list_of_values, filename,
+                              hdf_names, netcdf_names, clicked)
 
-                    #  HANDLING HDF FILES
+        # OPEN IN DATAVIEWER BUTTON
 
-                    if any(substring in filename.lower() for substring in hdf_names):
-
-                        dataset = h5py.File(filename, 'r')
-
-                        grid = dataset['Grid']
-
-                        dataframe = pd.DataFrame(columns=list_of_values)
-
-                        for i in range(len(list_of_values)):
-                            this_column = dataframe.columns[i]
-
-                            if clicked.get() == 'ALL':
-                                dataframe[this_column] = pd.Series(np.array(
-                                    list(grid['{}'.format(list_of_values[i])])).flatten())
-                            else:
-                                dataframe[this_column] = pd.Series(np.array(
-                                    list(grid['{}'.format(list_of_values[i])])).flatten()[:int(clicked.get())])
-
-                            dataframe[this_column] = dataframe[this_column].mask(
-                                dataframe[this_column] < -9990)
-
-                        dataviewer(dataframe)
-
-                    # HANDLING NETCDF FILES
-
-                    elif any(substring in filename.lower() for substring in netcdf_names):
-
-                        dataset = netCDF4.Dataset(
-                            filename, 'r', format='NETCDF4')
-
-                        dataframe = pd.DataFrame(columns=list_of_values)
-
-                        for i in range(len(list_of_values)):
-                            this_column = dataframe.columns[i]
-                            dataframe[this_column] = np.array(
-                                list(dataset['{}'.format(list_of_values[i])])).flatten()[:int(clicked.get())]
-
-                        dataviewer(dataframe)
-
-                except ValueError as err:
-                    messagebox.showerror('ERROR', '{}'.format(err))
-
-    # OPEN IN DATAVIEWER BUTTON
-
-    btn_open_in_dataviewer = Button(display_frame, text="Open In DataViewer",
-                                    command=open_in_dataviewer, bg=btns_color, width=20)
-    btn_open_in_dataviewer.grid(
-        row=len(vars) + occupied_rows, columnspan=3, pady=10)
+        btn_open_in_dataviewer = Button(display_frame, text="Open In DataViewer",
+                                        command=open_in_dataviewer, bg=btns_color, width=20)
+        btn_open_in_dataviewer.grid(
+            row=len(vars) + 2, columnspan=3, pady=10)
 
 
 #  BUTTON FOR OPENING A FILE
