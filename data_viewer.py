@@ -1,9 +1,8 @@
 from tkinter import *
-from tkinter import ttk
+from tkinter.ttk import Treeview
 from tkinter import messagebox
 from tkinter import filedialog
-# import warnings
-# warnings.filterwarnings("ignore")
+import matplotlib.pyplot as plt
 
 # DATAVIEWER
 
@@ -37,7 +36,7 @@ def dataviewer(dataframe):
     vertical_scroll = Scrollbar(dataviewer_frame)
     vertical_scroll.pack(side=RIGHT, fill=Y)
 
-    dataviewer = ttk.Treeview(
+    dataviewer = Treeview(
         dataviewer_frame, xscrollcommand=horizontal_scroll.set, yscrollcommand=vertical_scroll.set, selectmode=NONE)
 
     horizontal_scroll.config(command=dataviewer.xview)
@@ -84,9 +83,10 @@ def dataviewer(dataframe):
         ['KURTOSIS', *list(dataframe.kurtosis())],
     ]
     statistics_frame = Frame(root)
-    statistics_frame.pack()
+    statistics_frame.pack(side=LEFT, padx=10)
 
-    statistics_table = ttk.Treeview(statistics_frame)
+    statistics_table = Treeview(statistics_frame, selectmode=NONE)
+
     statistics_table['columns'] = ['statistic', *list(columns)]
     statistics_table['show'] = 'headings'
 
@@ -98,8 +98,41 @@ def dataviewer(dataframe):
 
     statistics_table.pack()
 
-    # if FutureWarning:
-    #     messagebox.showwarning(
-    #         title='ERROR', message='One of the variables in the file is in text format. Cannot show the statistics for that variable properly!')
+    def plot_2D():
+        dataframe.plot()
+        plt.show()
+
+    plots_frame = Frame(root, bg='#F8F9FA')
+    plots_frame.pack(side=RIGHT, padx=50)
+
+    # IMAGES
+
+    list_of_images = [PhotoImage(master=root, file='./images/2-d-plot.png'),
+                      PhotoImage(master=root, file='./images/3-d-plot.png'),
+                      PhotoImage(master=root, file='./images/histogram.png'),
+                      PhotoImage(master=root, file='./images/q-q-plot.png'),
+                      PhotoImage(master=root, file='./images/scatter-plot.png')]
+
+    # BUTTONS FOR PLOTS
+
+    btn_2d_plot = Button(
+        plots_frame, image=list_of_images[0], text='2D-Plot',  compound=TOP, bg='#DEE2E6', command=plot_2D)
+    btn_2d_plot.grid(row=0, column=0, padx=5, pady=5)
+
+    btn_3d_plot = Button(
+        plots_frame, image=list_of_images[1], text='3D-Plot', compound=TOP, bg='#DEE2E6')
+    btn_3d_plot.grid(row=0, column=1, padx=5, pady=5)
+
+    btn_histogram = Button(
+        plots_frame, image=list_of_images[2], text='Histogram', compound=TOP, bg='#DEE2E6')
+    btn_histogram.grid(row=1, column=0, padx=5, pady=5)
+
+    btn_qq_plot = Button(
+        plots_frame, image=list_of_images[3], text='Q-Q-Plot', compound=TOP, bg='#DEE2E6')
+    btn_qq_plot.grid(row=1, column=1, padx=5, pady=5)
+
+    btn_scatter_plot = Button(
+        plots_frame, image=list_of_images[4], text='Scatter-Plot', compound=TOP, bg='#DEE2E6')
+    btn_scatter_plot.grid(row=2, column=0, padx=5, pady=5)
 
     root.mainloop()
