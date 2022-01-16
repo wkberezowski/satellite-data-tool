@@ -3,6 +3,7 @@ from tkinter.ttk import Treeview
 from tkinter import messagebox
 from tkinter import filedialog
 import matplotlib.pyplot as plt
+from mpl_toolkits import mplot3d
 
 # DATAVIEWER
 
@@ -11,8 +12,8 @@ def dataviewer(dataframe):
     root = Tk()
     root.title('Data Viewer')
 
-    app_width = 1000
-    app_height = 600
+    app_width = 1500
+    app_height = 750
 
     screen_width = root.winfo_screenwidth()
     screen_height = root.winfo_screenheight()
@@ -30,17 +31,17 @@ def dataviewer(dataframe):
     dataviewer_frame = Frame(root, background='#F8F9FA')
     dataviewer_frame.pack(pady=10)
 
-    horizontal_scroll = Scrollbar(dataviewer_frame, orient='horizontal')
-    horizontal_scroll.pack(side=BOTTOM, fill=X)
+    dataviewer_h_scroll = Scrollbar(dataviewer_frame, orient='horizontal')
+    dataviewer_h_scroll.pack(side=BOTTOM, fill=X)
 
-    vertical_scroll = Scrollbar(dataviewer_frame)
-    vertical_scroll.pack(side=RIGHT, fill=Y)
+    dataviewer_v_scroll = Scrollbar(dataviewer_frame)
+    dataviewer_v_scroll.pack(side=RIGHT, fill=Y)
 
     dataviewer = Treeview(
-        dataviewer_frame, xscrollcommand=horizontal_scroll.set, yscrollcommand=vertical_scroll.set, selectmode=NONE)
+        dataviewer_frame, xscrollcommand=dataviewer_h_scroll.set, yscrollcommand=dataviewer_v_scroll.set, selectmode=NONE)
 
-    horizontal_scroll.config(command=dataviewer.xview)
-    vertical_scroll.config(command=dataviewer.yview)
+    dataviewer_h_scroll.config(command=dataviewer.xview)
+    dataviewer_v_scroll.config(command=dataviewer.yview)
 
     dataviewer['columns'] = list(columns)
     dataviewer['show'] = 'headings'
@@ -85,7 +86,17 @@ def dataviewer(dataframe):
     statistics_frame = Frame(root)
     statistics_frame.pack(side=LEFT, padx=10)
 
-    statistics_table = Treeview(statistics_frame, selectmode=NONE)
+    statistics_h_scroll = Scrollbar(statistics_frame, orient='horizontal')
+    statistics_h_scroll.pack(side=BOTTOM, fill=X)
+
+    statistics_v_scroll = Scrollbar(statistics_frame, orient='vertical')
+    statistics_v_scroll.pack(side=RIGHT, fill=Y)
+
+    statistics_table = Treeview(statistics_frame, xscrollcommand=statistics_h_scroll.set,
+                                yscrollcommand=statistics_v_scroll.set, selectmode=NONE)
+
+    statistics_h_scroll.config(command=statistics_table.xview)
+    statistics_v_scroll.config(command=statistics_table.yview)
 
     statistics_table['columns'] = ['statistic', *list(columns)]
     statistics_table['show'] = 'headings'
@@ -102,8 +113,17 @@ def dataviewer(dataframe):
         dataframe.plot()
         plt.show()
 
+    def plot_3D():
+        list_of_columns = []
+        for column in dataframe.columns:
+            list_of_columns.append(dataframe[column])
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+        ax.scatter(*list_of_columns)
+        plt.show()
+
     plots_frame = Frame(root, bg='#F8F9FA')
-    plots_frame.pack(side=RIGHT, padx=50)
+    plots_frame.pack(side=LEFT, padx=50)
 
     # IMAGES
 
@@ -120,7 +140,7 @@ def dataviewer(dataframe):
     btn_2d_plot.grid(row=0, column=0, padx=5, pady=5)
 
     btn_3d_plot = Button(
-        plots_frame, image=list_of_images[1], text='3D-Plot', compound=TOP, bg='#DEE2E6')
+        plots_frame, image=list_of_images[1], text='3D-Plot', compound=TOP, bg='#DEE2E6', command=plot_3D)
     btn_3d_plot.grid(row=0, column=1, padx=5, pady=5)
 
     btn_histogram = Button(
