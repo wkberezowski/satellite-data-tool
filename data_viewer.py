@@ -1,4 +1,3 @@
-from distutils import command
 from tkinter import *
 from tkinter.ttk import Treeview
 from tkinter import messagebox
@@ -141,8 +140,12 @@ def dataviewer(dataframe):
         list_of_columns = []
         for column in dataframe.columns:
             list_of_columns.append(list(dataframe[column]))
-        stats.probplot(*list_of_columns, plot=pylab)
-        pylab.show()
+        if len(list_of_columns) > 1:
+            messagebox.showerror(
+                title='ERROR', message='For the Q-Q plot you must select only one column')
+        else:
+            stats.probplot(*list_of_columns, plot=pylab)
+            pylab.show()
 
     def plot_scatter():
         plt.close('all')
