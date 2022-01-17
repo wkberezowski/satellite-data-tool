@@ -1,9 +1,11 @@
+from distutils import command
 from tkinter import *
 from tkinter.ttk import Treeview
 from tkinter import messagebox
 from tkinter import filedialog
 import matplotlib.pyplot as plt
-from mpl_toolkits import mplot3d
+import pylab
+import scipy.stats as stats
 
 # DATAVIEWER
 
@@ -110,16 +112,42 @@ def dataviewer(dataframe):
     statistics_table.pack()
 
     def plot_2D():
+        plt.close('all')
         dataframe.plot()
         plt.show()
 
     def plot_3D():
+        plt.close('all')
         list_of_columns = []
         for column in dataframe.columns:
             list_of_columns.append(dataframe[column])
-        fig = plt.figure()
-        ax = fig.add_subplot(111, projection='3d')
-        ax.scatter(*list_of_columns)
+
+        if len(list_of_columns) < 3:
+            messagebox.showerror(
+                title='ERROR', message='For 3D plots you must select 3 columns')
+        else:
+            fig = plt.figure()
+            ax = fig.add_subplot(111, projection='3d')
+            ax.scatter3D(*list_of_columns)
+            plt.show()
+
+    def plot_hist():
+        plt.close('all')
+        dataframe.plot.hist()
+        plt.show()
+
+    def plot_q_q():
+        plt.close('all')
+        list_of_columns = []
+        for column in dataframe.columns:
+            list_of_columns.append(list(dataframe[column]))
+        stats.probplot(*list_of_columns, plot=pylab)
+        pylab.show()
+
+    def plot_scatter():
+        plt.close('all')
+        list_of_columns = list(dataframe.columns)
+        dataframe.plot.scatter(list_of_columns[0], list_of_columns[1])
         plt.show()
 
     plots_frame = Frame(root, bg='#F8F9FA')
@@ -137,22 +165,22 @@ def dataviewer(dataframe):
 
     btn_2d_plot = Button(
         plots_frame, image=list_of_images[0], text='2D-Plot',  compound=TOP, bg='#DEE2E6', command=plot_2D)
-    btn_2d_plot.grid(row=0, column=0, padx=5, pady=5)
+    btn_2d_plot.grid(row=0, column=0, padx=10, pady=5)
 
     btn_3d_plot = Button(
         plots_frame, image=list_of_images[1], text='3D-Plot', compound=TOP, bg='#DEE2E6', command=plot_3D)
-    btn_3d_plot.grid(row=0, column=1, padx=5, pady=5)
+    btn_3d_plot.grid(row=0, column=1, padx=10, pady=5)
 
     btn_histogram = Button(
-        plots_frame, image=list_of_images[2], text='Histogram', compound=TOP, bg='#DEE2E6')
-    btn_histogram.grid(row=1, column=0, padx=5, pady=5)
+        plots_frame, image=list_of_images[2], text='Histogram', compound=TOP, bg='#DEE2E6', command=plot_hist)
+    btn_histogram.grid(row=0, column=2, padx=10, pady=5)
 
     btn_qq_plot = Button(
-        plots_frame, image=list_of_images[3], text='Q-Q-Plot', compound=TOP, bg='#DEE2E6')
-    btn_qq_plot.grid(row=1, column=1, padx=5, pady=5)
+        plots_frame, image=list_of_images[3], text='Q-Q-Plot', compound=TOP, bg='#DEE2E6', command=plot_q_q)
+    btn_qq_plot.grid(row=0, column=3, padx=10, pady=5)
 
     btn_scatter_plot = Button(
-        plots_frame, image=list_of_images[4], text='Scatter-Plot', compound=TOP, bg='#DEE2E6')
-    btn_scatter_plot.grid(row=2, column=0, padx=5, pady=5)
+        plots_frame, image=list_of_images[4], text='Scatter-Plot', compound=TOP, bg='#DEE2E6', command=plot_scatter)
+    btn_scatter_plot.grid(row=0, column=4, padx=10, pady=5)
 
     root.mainloop()
