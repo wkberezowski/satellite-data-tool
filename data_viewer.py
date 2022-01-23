@@ -1,7 +1,9 @@
 from tkinter import *
+from tkinter import font
 from tkinter.ttk import Treeview
 from tkinter import messagebox
 from tkinter import filedialog
+from turtle import width
 import matplotlib.pyplot as plt
 import pylab
 import scipy.stats as stats
@@ -75,45 +77,63 @@ def dataviewer(dataframe):
 
     dataviewer.pack()
 
-    statistics = [
-        ['MIN', *list(dataframe.min())],
-        ['MAX', *list(dataframe.max())],
-        ['MEAN', *list(dataframe.mean())],
-        ['STANDARD DEVIATION', *list(dataframe.std())],
-        ['VARIANCE', *list(dataframe.var())],
-        ['SKEWNESS', *list(dataframe.skew())],
-        ['KURTOSIS', *list(dataframe.kurtosis())],
-    ]
-    statistics_frame = Frame(root)
-    statistics_frame.pack(side=LEFT, padx=10)
+    try:
 
-    statistics_h_scroll = Scrollbar(statistics_frame, orient='horizontal')
-    statistics_h_scroll.pack(side=BOTTOM, fill=X)
+        statistics = [
+            ['MIN', *list(dataframe.min().astype(float).round(3))],
+            ['MAX', *list(dataframe.max().astype(float).round(3))],
+            ['MEAN', *list(dataframe.mean().astype(float).round(3))],
+            ['STANDARD DEVIATION', *
+                list(dataframe.std().astype(float).round(3))],
+            ['VARIANCE', *
+                list(dataframe.var().astype(float).round(3))],
+            ['SKEWNESS', *
+                list(dataframe.skew().astype(float).round(3))],
+            ['KURTOSIS', *
+                list(dataframe.kurtosis().astype(float).round(3))],
+        ]
 
-    statistics_v_scroll = Scrollbar(statistics_frame, orient='vertical')
-    statistics_v_scroll.pack(side=RIGHT, fill=Y)
+        statistics_frame = Frame(root)
+        statistics_frame.pack(side=LEFT, padx=10)
 
-    statistics_table = Treeview(statistics_frame, xscrollcommand=statistics_h_scroll.set,
-                                yscrollcommand=statistics_v_scroll.set, selectmode=NONE)
+        statistics_h_scroll = Scrollbar(statistics_frame, orient='horizontal')
+        statistics_h_scroll.pack(side=BOTTOM, fill=X)
 
-    statistics_h_scroll.config(command=statistics_table.xview)
-    statistics_v_scroll.config(command=statistics_table.yview)
+        statistics_v_scroll = Scrollbar(statistics_frame, orient='vertical')
+        statistics_v_scroll.pack(side=RIGHT, fill=Y)
 
-    statistics_table['columns'] = ['statistic', *list(columns)]
-    statistics_table['show'] = 'headings'
+        statistics_table = Treeview(statistics_frame, xscrollcommand=statistics_h_scroll.set,
+                                    yscrollcommand=statistics_v_scroll.set, selectmode=NONE)
 
-    for column in statistics_table['columns']:
-        statistics_table.heading(column, text=column)
+        statistics_h_scroll.config(command=statistics_table.xview)
+        statistics_v_scroll.config(command=statistics_table.yview)
 
-    for row in statistics:
-        statistics_table.insert('', 'end', values=row)
+        statistics_table['columns'] = ['statistic', *list(columns)]
+        statistics_table['show'] = 'headings'
 
-    statistics_table.pack()
+        for column in statistics_table['columns']:
+            statistics_table.heading(column, text=column, width=10)
+
+        for row in statistics:
+            statistics_table.insert('', 'end', values=row)
+
+        statistics_table.pack()
+
+    except ValueError:
+        Label(root, text="COLUMN WITH STRING VALUES DETECTED! CANNOT SHOW STATISTICS!",
+              bg='#F8F9FA', font=('Helvetica 14 bold')).pack(side=LEFT, padx=20)
 
     def plot_2D():
         plt.close('all')
-        dataframe.plot()
-        plt.show()
+        list_of_columns = []
+        for column in dataframe.columns:
+            list_of_columns.append(dataframe[column])
+        if len(list_of_columns) != 2:
+            messagebox.showerror(
+                title="ERROR", message="For 2D plots you must select 2 columns")
+        else:
+            dataframe.plot()
+            plt.show()
 
     def plot_3D():
         plt.close('all')
@@ -154,7 +174,7 @@ def dataviewer(dataframe):
         plt.show()
 
     plots_frame = Frame(root, bg='#F8F9FA')
-    plots_frame.pack(side=LEFT, padx=50)
+    plots_frame.pack(side=RIGHT, padx=50)
 
     # IMAGES
 

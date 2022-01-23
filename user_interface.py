@@ -164,7 +164,7 @@ def open():
         options = ['ALL',
                    '500',
                    '1000',
-                   '1500', ]
+                   '5000', ]
 
         clicked = StringVar()
         clicked.set(options[0])
@@ -197,6 +197,7 @@ def open():
         btn_open_in_dataviewer.grid(
             row=len(vars) + 2, columnspan=3, pady=10)
 
+
 #  BUTTON FOR OPENING A FILE
 btn_open = Button(btns_frame, text="Open",
                   command=open, bg=btns_color, width=15)
@@ -213,7 +214,7 @@ def close_file():
 
 
 btn_close_file = Button(btns_frame, text="Close File",
-                        bg=btns_color, width=15)
+                        bg=btns_color, width=15, command=close_file)
 btn_close_file.grid(row=1, column=0, sticky='ns', padx=10, pady=7)
 
 # BUTTON FOR CLOSING THE APP
@@ -221,6 +222,5 @@ btn_close_file.grid(row=1, column=0, sticky='ns', padx=10, pady=7)
 btn_close_app = Button(btns_frame, text='Close App',
                        command=root.destroy, bg=btns_color, width=15)
 btn_close_app.grid(row=2, column=0, sticky='ns', padx=10, pady=7)
-
 
 root.mainloop()
