@@ -10,7 +10,7 @@ def dataviewer_display(list_of_values, filename, hdf_names, netcdf_names, clicke
 
     if len(list_of_values) < 1:
         messagebox.showwarning(
-            title='ERROR', message='There is nothing added to the list')
+            title='ERROR', message='There is nothing added to the list.')
     else:
         #  HANDLING HDF FILES
 

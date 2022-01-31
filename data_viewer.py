@@ -1,9 +1,7 @@
 from tkinter import *
-from tkinter import font
 from tkinter.ttk import Treeview
 from tkinter import messagebox
 from tkinter import filedialog
-from turtle import width
 import matplotlib.pyplot as plt
 import pylab
 import scipy.stats as stats
@@ -112,7 +110,7 @@ def dataviewer(dataframe):
         statistics_table['show'] = 'headings'
 
         for column in statistics_table['columns']:
-            statistics_table.heading(column, text=column, width=10)
+            statistics_table.heading(column, text=column)
 
         for row in statistics:
             statistics_table.insert('', 'end', values=row)
@@ -130,9 +128,11 @@ def dataviewer(dataframe):
             list_of_columns.append(dataframe[column])
         if len(list_of_columns) != 2:
             messagebox.showerror(
-                title="ERROR", message="For 2D plots you must select 2 columns")
+                title="ERROR", message="For 2D plot you must select 2 columns.")
         else:
-            dataframe.plot()
+            ax = dataframe.plot()
+            ax.set_xlabel(dataframe.columns[0])
+            ax.set_ylabel(dataframe.columns[1])
             plt.show()
 
     def plot_3D():
@@ -143,11 +143,14 @@ def dataviewer(dataframe):
 
         if len(list_of_columns) < 3:
             messagebox.showerror(
-                title='ERROR', message='For 3D plots you must select 3 columns')
+                title='ERROR', message='For 3D plot you must select 3 columns.')
         else:
             fig = plt.figure()
             ax = fig.add_subplot(111, projection='3d')
             ax.scatter3D(*list_of_columns)
+            ax.set_xlabel(dataframe.columns[0])
+            ax.set_ylabel(dataframe.columns[1])
+            ax.set_zlabel(dataframe.columns[2])
             plt.show()
 
     def plot_hist():
@@ -162,7 +165,7 @@ def dataviewer(dataframe):
             list_of_columns.append(list(dataframe[column]))
         if len(list_of_columns) > 1:
             messagebox.showerror(
-                title='ERROR', message='For the Q-Q plot you must select only one column')
+                title='ERROR', message='For the Q-Q plot you must select only one column.')
         else:
             stats.probplot(*list_of_columns, plot=pylab)
             pylab.show()
@@ -170,8 +173,12 @@ def dataviewer(dataframe):
     def plot_scatter():
         plt.close('all')
         list_of_columns = list(dataframe.columns)
-        dataframe.plot.scatter(list_of_columns[0], list_of_columns[1])
-        plt.show()
+        if len(list_of_columns) != 2:
+            messagebox.showerror(
+                title='ERROR', message='For scatter plot you must select 2 columns.')
+        else:
+            dataframe.plot.scatter(*list_of_columns)
+            plt.show()
 
     plots_frame = Frame(root, bg='#F8F9FA')
     plots_frame.pack(side=RIGHT, padx=50)
@@ -188,22 +195,22 @@ def dataviewer(dataframe):
 
     btn_2d_plot = Button(
         plots_frame, image=list_of_images[0], text='2D-Plot',  compound=TOP, bg='#DEE2E6', command=plot_2D)
-    btn_2d_plot.grid(row=0, column=0, padx=10, pady=5)
+    btn_2d_plot.grid(row=0, column=0, padx=10, pady=2)
 
     btn_3d_plot = Button(
         plots_frame, image=list_of_images[1], text='3D-Plot', compound=TOP, bg='#DEE2E6', command=plot_3D)
-    btn_3d_plot.grid(row=0, column=1, padx=10, pady=5)
+    btn_3d_plot.grid(row=1, column=0, padx=10, pady=2)
 
     btn_histogram = Button(
         plots_frame, image=list_of_images[2], text='Histogram', compound=TOP, bg='#DEE2E6', command=plot_hist)
-    btn_histogram.grid(row=0, column=2, padx=10, pady=5)
+    btn_histogram.grid(row=2, column=0, padx=10, pady=2)
 
     btn_qq_plot = Button(
         plots_frame, image=list_of_images[3], text='Q-Q-Plot', compound=TOP, bg='#DEE2E6', command=plot_q_q)
-    btn_qq_plot.grid(row=0, column=3, padx=10, pady=5)
+    btn_qq_plot.grid(row=3, column=0, padx=10, pady=2)
 
     btn_scatter_plot = Button(
         plots_frame, image=list_of_images[4], text='Scatter-Plot', compound=TOP, bg='#DEE2E6', command=plot_scatter)
-    btn_scatter_plot.grid(row=0, column=4, padx=10, pady=5)
+    btn_scatter_plot.grid(row=4, column=0, padx=10, pady=2)
 
     root.mainloop()
